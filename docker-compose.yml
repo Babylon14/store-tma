@@ -1,0 +1,80 @@
+services:
+  # --- БАЗА ДАННЫХ POSTGRESQL ---
+  db:
+    image: postgres:16-alpine
+    container_name: shop_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # --- ПАНЕЛЬ УПРАВЛЕНИЯ PGADMIN ---
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: shop_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - 5050:80
+    depends_on:
+      - db
+
+  # --- CACHE / БРОКЕР REDIS---
+  redis:
+    image: redis:7-alpine
+    container_name: shop_redis
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  
+  # --- BACKEND (API) ---
+  backend:
+    build: ./backend
+    container_name: shop_app
+    command: gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - SENTRY_DSN=${SENTRY_DSN}
+    depends_on:
+      - db
+      - redis
+
+  # --- WORKER (CELERY) ---
+  celery_worker:
+      build: ./backend
+      container_name: shop_worker
+      command: celery -A src.worker.celery_app worker --loglevel=info
+      env_file:
+        - ./backend/.env
+      depends_on:
+        - redis
+        - db
+
+  # --- FLOWER (CELERY) ---
+  flower:
+    image: mher/flower
+    container_name: shop_flower
+    command: celery -A src.worker.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - redis
+      - celery_worker
+
+volumes:
+  postgres_data:
+

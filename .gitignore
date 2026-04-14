@@ -1,0 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+backend/.venv/
+ENV/
+env/
+.env
+.env.*
+!.env.example
+
+# UV manager
+.uv/
+
+# Docker
+.docker/
+
+# Databases (локальные данные, если решите хранить в папке проекта)
+postgres_data/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Frontend (Node.js)
+node_modules/
+dist/
+build/
+.next/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+
+# Sentry (если используете CLI)
+.sentryclirc
+
