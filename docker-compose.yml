@@ -15,8 +15,8 @@ services:
     image: dpage/pgadmin4
     container_name: shop_pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
       - 5050:80
     depends_on:
@@ -44,9 +44,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./backend/.env
-    environment:
-      - SENTRY_DSN=${SENTRY_DSN}
+      - .env
     depends_on:
       - db
       - redis
@@ -55,9 +53,9 @@ services:
   celery_worker:
       build: ./backend
       container_name: shop_worker
-      command: celery -A src.worker.celery_app worker --loglevel=info
+      command: celery -A src.tasks.celery_app worker --loglevel=info
       env_file:
-        - ./backend/.env
+        - .env
       depends_on:
         - redis
         - db
@@ -66,11 +64,11 @@ services:
   flower:
     image: mher/flower
     container_name: shop_flower
-    command: celery -A src.worker.celery_app flower --port=5555
+    command: celery -A src.tasks.celery_app flower --port=5555
     ports:
       - "5555:5555"
     env_file:
-      - ./backend/.env
+      - .env
     depends_on:
       - redis
       - celery_worker
