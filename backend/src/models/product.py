@@ -21,7 +21,7 @@ class Product(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id", ondelete="CASCADE"))
     category: Mapped["Category"] = relationship("Category", back_populates="products")
     
-    # # Связь с вариантами (размеры, цены)
+    # Связь с вариантами (размеры, цены)
     variants: Mapped[list["ProductVariant"]] = relationship(
         "ProductVariant", 
         back_populates="product", 
