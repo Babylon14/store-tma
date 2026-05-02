@@ -1,6 +1,8 @@
 import sentry_sdk
 from fastapi import FastAPI
+
 from src.core.config import settings
+from src.api.v1.endpoints.categories_api import router as category_router
 
 
 # Инициализация Sentry
@@ -38,4 +40,9 @@ async def health_check():
 # async def trigger_error():
 #     division_by_zero = 1 / 0
 #     return division_by_zero
+
+
+# Подключаем роутер с префиксом
+app.include_router(router=category_router, prefix="/api/v1/categories")
+
 
