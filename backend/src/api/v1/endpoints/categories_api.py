@@ -6,7 +6,7 @@ from src.schemas.category_schema import CategoryCreate, CategoryResponse, Catego
 from src.repositories.category_repository import CategoryRepository
 
 
-router = APIRouter()
+router = APIRouter(tags=["Categories"])
 
 @router.post(path="/", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
 async def create_category(

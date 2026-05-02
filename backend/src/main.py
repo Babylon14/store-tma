@@ -13,12 +13,21 @@ if settings.is_sentry_enabled:
         profile_lifecycle=1.0
     )
 
+# Описываем метаданные тегов
+tags_metadata = [
+    {
+        "name": "Categories",
+        "description": "Операции для управления категориями товаров",
+        "x-displayName": "Категории товаров",  
+    },
+]
 
 # Настройка FastAPI
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="API for shop",
-    version="0.1.0"
+    version="0.1.0",
+    openapi_tags=tags_metadata,
 )
 
 
@@ -43,6 +52,6 @@ async def health_check():
 
 
 # Подключаем роутер с префиксом
-app.include_router(router=category_router, prefix="/api/v1/categories")
+app.include_router(router=category_router, prefix="/api/v1/categories", tags=["Categories"])
 
 
