@@ -17,11 +17,11 @@ class Product(Base):
     description: Mapped[str | None] = mapped_column(Text)
     image_url: Mapped[str | None] = mapped_column(String(255))
 
-    # Связь с категорией
+    # Внешний ключ на категорию
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id", ondelete="CASCADE"))
-    category: Mapped["Category"] = relationship("Category", back_populates="products")
     
-    # Связь с вариантами (размеры, цены)
+    # Связи
+    category: Mapped["Category"] = relationship("Category", back_populates="products")
     variants: Mapped[list["ProductVariant"]] = relationship(
         "ProductVariant", 
         back_populates="product", 
@@ -40,8 +40,10 @@ class ProductVariant(Base):
     price: Mapped[PyDecimal] = mapped_column(Numeric(10, 2))
     stock: Mapped[int] = mapped_column(Integer, default=0)
     
-    # Связь с товаром
+    # Внешний ключ на продукт
     product_id: Mapped[int] = mapped_column(ForeignKey("product.id", ondelete="CASCADE"))
+    
+    # Связь с товаром
     product: Mapped["Product"] = relationship("Product", back_populates="variants")
 
     def __repr__(self):
